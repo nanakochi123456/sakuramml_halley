@@ -6,6 +6,7 @@
 // 著作者：旺文社（注：製作者のみ使用許諾済）
 // MMLかき：ななこっち★ @2013/09/28
 // MMLかきなおし：ななこっち★ @2013/09/28
+// MMLさらにかきなおし：ななこっち★ @2015/01/07
 // ライセンス：転載禁止、改変禁止
 //
 // 奨励音源
@@ -19,6 +20,8 @@
 // この曲の最大のテーマである発進音もどき（FM音源）もありません。
 // 本来なら45小節に入ります
 // エンディングは、完全に記憶がないため、模造しています。
+// サウンドフォントは、ドラムとピアノ、トランペット以外、可能な限り、
+// FX-1に近い物を選定しています。
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // 原曲の楽器
 // YAMAHA FX-1 ×2
@@ -37,6 +40,7 @@
 // acoustic_grand_piano_ydp_20080910
 // Famicom
 // drumkit1.3XG
+// その他・・・
 // ↑容量的にはかなり贅沢ですが、費用的にはタダです
 // 32bitパソコンで、全部メモりに読み込めば、パンクします
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -48,6 +52,8 @@
 //
 // YAMAHAで子供の時に作曲して、まともな曲だったら、JOC出れるはずなんですが
 // これは出ていません。。。（大賞応募前です）
+// （実際には、3人用→10人用にアレンジをして、ピアノのグループレッスンメンバー
+// 10名で発表会で演奏しました。。。）
 //
 // 最初のほうのピコピコ音は、DX-7のピッチエンベロープを再現したものです。
 //
@@ -66,12 +72,148 @@
 // （会社（仮称）サーバートラブルのため、一時休止）
 // 調整フェーズ制作開始：2013/09/29 04:30
 // MML完成　 　　　　　：2013/09/29 14:30
+// 有料販売用データ完成：2015/01/07 12:07
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 Tempo 100
+System.TimeBase=10368
+Expression.Frequency(1);
+Modulation.Frequency(1);
 
 #PEDALON={Sub {r16y64,127}}
 #PEDALOFF={r-32 y64,0 r32}
+
+Function RandV(Int MIN, Int MAX) {
+	Str MML="v"
+	MML=MML+Random(MIN,MAX)
+//		Print(MML)
+	MML
+}
+
+Str RMML
+Function RandR(Int MIN, Int MAX) {
+	Str MML
+//	Str MML=RMML
+//	RMML=""
+	IF(NODTM=1) {
+		MML=MML+"r"
+		RMML=RMML+"r"
+		Int VALUE=Random(0,10)
+		IF(VALUE<5) {
+			MML=MML+"-"
+		} ELSE {
+			RMML=RMML+"-"
+		}
+		Str RAND=Random(MIN,MAX)
+		MML=MML+RAND
+		RMML=RMML+RAND
+//		Print(MML)
+		MML
+	}
+}
+
+Function SyncR() {
+	Str MML=RMML
+	RMML=""
+//	Print(MML)
+	MML
+}
+
+Function BG(Str MML) {
+　　Str BUF=""
+    Str FIRST=""
+　　Str ML=""
+　　Str M
+　　Str R
+    Str FM
+    Int C=0
+
+　　BUF=""
+    R=""
+　　For(Int i=1; MID(MML, i, 1)!=""; i++) {
+　　　　M=MID(MML, i, 1)
+//        Print("Count "+ C + " Str="+M)
+　　　　IF(M="a"||M="b"||M="c"||M="d"||M="e"||M="f"||M="g") {
+		C++
+	  	IF(C<3) {
+			FIRST=ML
+			ML=FM+M
+			FM=""
+		} ELSE {
+	　　　　　　R=R+"r"+Random(144,384)
+　　　　　　　　	BUF=BUF+"Sub" + CHR(123)+R+ML+CHR(125)
+	　　　　　　ML=M
+		}
+　　　　} ELSE {
+		IF(C>0) {
+　　　　　　	ML=ML+M
+		} ELSE {
+			FM=FM+M
+		}
+　　　　}
+　　}
+　　BUF="Sub"+CHR(123)+FIRST+CHR(125)+BUF+"Sub"+CHR(123)+R+ML+CHR(125)+"r"
+//    Print(BUF)
+//	IF(GAKUHU=1) {
+//		BUF="'"+MML+"'"
+//	}
+　　BUF
+}
+
+Function BF(Str MML) {
+	Str BUF=""
+	Str FIRST=""
+	Str ML=""
+	Str M
+	Str R
+	Str FM
+	Int C=0
+
+	MML=#STR(RandV(70,90))+MML+">"+#STR(RandV(70,90))+MML+"<"
+	BUF=""
+	R=""
+	For(Int i=1; MID(MML, i, 1)!=""; i++) {
+		M=MID(MML, i, 1)
+//		Print("Count "+ C + " Str="+M)
+		IF(M="a"||M="b"||M="c"||M="d"||M="e"||M="f"||M="g") {
+			IF(C>0) {
+				FIRST=ML
+				ML=FM+""+M
+				FM=""
+			} ELSE {
+				IF(RATE>0) {
+					IF(RATE=1) {
+						R=R+"r"+Random(100,512)
+					} ELSE {
+						IF(RATE=2) {
+							R=R+"r"+Random(84,384)
+						} ELSE {
+							IF(RATE=3) {
+								R=R+"r"+Random(45,384)
+							} ELSE {
+				　　	　		R=R+"r"+Random(30,192)
+							}
+						}
+					}
+				} ELSE {
+					R=""
+				}
+				BUF=BUF+"Sub" + CHR(123)+R+ML+CHR(125)
+				ML=""+M
+			}
+			C++
+		} ELSE {
+			IF(C>0) {
+				ML=ML+""+M
+			} ELSE {
+				FM=FM+""+M
+			}
+		}
+	}
+	BUF=BUF+"Sub"+CHR(123)+R+ML+CHR(125)+FIRST
+//	Print(BUF)
+　　BUF
+}
 
 //////////////////////////////////////////////////////////////////////////////
 TR(1)
@@ -109,7 +251,7 @@ TR(1)
 
 TR(2)
 	REV(127)
-	Voice(Strings2)
+	Voice(51)
 	v70
 	o5l40
 	[12 r1]
@@ -125,13 +267,14 @@ TR(2)
 	#PEDALOFF
 	#PEDALON
 	Tempo 95
-	[3 [4 c#e#g#bg# ] ]
-	[2 c#e#g#bg# ]
-
+	[11 c#e#g#bg# ]
 	#PEDALOFF
-	#PEDALON
+	[3 rrrrr ]
+
+	r-4r-32
 	Tempo 110
 	l32
+	#PEDALON
 	[4 [4 g>ceg< ] ]
 	#PEDALOFF
 	#PEDALON
@@ -311,7 +454,7 @@ Tempo 180
 }
 
 #mcc1={
-	[2 r[2'g>ce<'] ] r'g>ce<'
+	[2 r[2 BG(g>ce<)] ] r BG(g>ce<)
 }
 
 #mb1={
@@ -321,7 +464,7 @@ Tempo 180
 
 #mc1={
 	#mcc1
-	[2 r[2'fb->d<'] ] r'fb->d<'
+	[2 r[2 BG(fb->d<)] ] r BG(fb->d<)
 }
 
 #mb2={
@@ -330,8 +473,8 @@ Tempo 180
 }
 
 #mc2={
-	[2 r[2'gb->e-<'] ] r'gb->e-<'
-	[2 r[2'gb->e<'] ] r'gb->e<'
+	[2 r[2 BG(gb->e-<)] ] r BG(gb->e-<)
+	[2 r[2 BG(gb->e<)] ] r BG(gb->e<)
 }
 
 #mb3={
@@ -364,35 +507,35 @@ Tempo 180
 }
 
 #mc3={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[2 r[2'g>cd<'] ] r'g>cd<'
-	[2 r[2'gb>d<'] ] r'gb>d<'
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[2 r[2 BG(g>cd<)] ] r BG(g>cd<)
+	[2 r[2 BG(gb>d<)] ] r BG(gb>d<)
 }
 
 #mc4={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[4 [3 'g>cd<' ] ] [2 [2 'g>cd<' ] ]
-	[4 [3 'gb>d<' ] ] [2 [2 'gb>d<' ] ]
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[4 [3 BG(g>cd<) ] ] [2 [2 BG(g>cd<) ] ]
+	[4 [3 BG(gb>d<) ] ] [2 [2 BG(gb>d<) ] ]
 }
 
 #mc5={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[4 [3 'g>cd<' ] ] [2 [2 'g>cd<' ] ]
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[4 [3 BG(g>cd<) ] ] [2 [2 BG(g>cd<) ] ]
 	[6 'gb>d<' ]
 	Sub {r2 Expression.onTime(64,0,!2) }
 	  'g1b1>d1<'
@@ -478,23 +621,23 @@ Tempo 180
 	g2^8<g>ce
 	f4e4d4c8<g8&
 	g1
-	^2^4.g>
+	^2^4rg>
 	g2^8<g>ce
 	f4e4d4c8g8&
 	g1
-	^2^4.g#8
+	^2^8r8g#4
 	a2^8<a>cf
 	a4>c4<b4a8g8&
 	g2.>dc#&
 	c#2r<c#de
 	f2^8<fa>c
 	e2^8<a>ce
-	d2^4.g&
+	q95 d2^4. q80 g&
 	g2
 }
 
 #mainmelody2={
-	r4 l28 gab>cdef l8
+	Sub{r4 l28 gab>cdef l8}r2
 	l8
 	g2^8<g>ce
 	f4e4d4c8<g8&
@@ -546,25 +689,26 @@ Tempo 180
 
 	o6
 	l4
-	Sub {'c1.f1.' }
-	a2.>c<ba
-	Sub {'<b2.>e2.' }
-	g2e
-	Sub {'<e2.a2.>' }
-	c2.
-	Sub {'<b2.>d2.' }
-	f2d
-	Sub {'<g#2.b2.>' }
+	Sub {BG(c1.f1.a2.)}
+	r2.>c<ba
+	Sub {BG(<b2.>e2.g2) }
+	r2e
+	l2. BG(<ea>c)
+	l4
+	Sub {BG(<b2.>d2.f2) }
+	r2d
+	Sub {BG(<g#2.b2.>) }
 	rcd
-	Sub {'<a1.>' }
-	'c2.e2.'c2.
+	l1. Sub{BG(<a>c)}
+	l2.ec
 
-	'c2.f2.a2.'
-	Sub { 'd2.g2.' }
-	b2g
-	'g#2.b2.>d2.<'
-	'e2.a2.>c2.<'<
+	l2. BG(cfa)
+	l4 Sub { BG(d2.g2.b2) }
+	r2g
+	l2. BG(g#b>d<)
+	l2. BG(ea>c<)<
 
+	l4
 	Sub {'a1.>c1.'}
 	f2.f#ga
 	'c1.^4d1.^4g1.^4'
@@ -587,21 +731,21 @@ Tempo 180
 	}
 	r4
 	<
-	'b1^2>d1^2g1^2'
+	l1.BG(b>dg)
 }
 
 #mainmelody3={
-	r4 l28 gab>cdef l8
+	Sub{r4 l28 gab>cdef l8}r2
 
 	l8
 	g2^8<g>ce
 	f4e4d4c8<g8&
 	g1
-	^2r4.g>
+	^2^4.g>
 	g2^8<g>ce
 	f4e4d4c8g8&
 	g1
-	^2r4g#4
+	^2^4g#4
 	a2^8<a>cf
 	a4>c4<b4a8g8&
 	g2.>dc#&
@@ -617,6 +761,7 @@ Tempo 180
 	g2&g8
 	Tempo 90
 	<g8>c8e8
+	q100
 	f4e4d4c8g8&
 	g1&g1&g1&g1&
 	Sub {r2 Expression.onTime(64,0,!2) }
@@ -672,21 +817,24 @@ TR(1)
 
 	Voice(Trumpet)
 	[4 r1]
-	o6q91
+	o6q80
 	#mainmelody1
 	o5
-	v120
+	v122
 	Voice(Strings1)
+	q85
 	#mainmelody2
 
 	r2
 	v110
 	Voice(DrawbarOrgan)
+	q88
 	#submelody1
 
 	o5
-	v122
+	v127
 	Voice(Strings1)
+	q88
 	#mainmelody3
 
 TR(2)
@@ -718,9 +866,9 @@ TR(3)
 
 TR(8)
 	Time(45:0:0)
-	Voice(SynthStrings1)
+	@(ElectricPiano2)//6
 	o3
-	v50
+	v70
 	#introbass
 	o4q40
 	#mainchord1
@@ -730,8 +878,8 @@ TR(8)
 	Voice(Strings2)
 	#subchord1
 	q40
-	v50
-	Voice(SynthStrings1)
+	@(ElectricPiano2)//6
+	v70
 	#mainchord3
 
 TR(14)
@@ -764,35 +912,38 @@ TR(9)
 TR(10)
 	Time(45:0:0)
 	Voice(1)
-	$k{n(Sticks),} //37
-	$B{n(Kick2),}//35
-	$b{n(Kick1),}//36
-	$S{n(Snare2),}//40
-	$s{n(Snare1),}//38
-	$L{n(LowTom2),}//41
-	$l{n(LowTom1),}//43
-	$M{n(MidTom2),}//45
-	$m{n(MidTom1),}//47
-	$T{n(HighTom2),}//48
-	$t{n(HighTom1),}//50
-	$p{n(PedalHiHat),}//44
-	$h{n(ClosedHiHat),}//42
-	$o{n(OpenHiHat),}//46
-	$r{n(RideCymbal1),}//51
-	$R{n(RideBell),}//53
-	// Ride cup
-	$i{n(MuteHighConga),}//62
-	$I{n(OpenHighConga),}//63
-	$c{n(CrashCymbal1),}//49
-	$C{n(CrashCymbal2),}//57
-	$H{n(SplashCymbal),}//55
-	$A{n(ChineseCymbal),}//52
+	$k{Sub{RandR(999,1728) RandV(124,127) n(Sticks),16}r} //37
+	$B{Sub{RandR(999,1728) RandV(124,127) n(Kick2),16}r}//35
+	$b{Sub{RandR(999,1728) RandV(124,127) n(Kick1),16}r}//36
+	$S{Sub{RandR(999,1728) RandV(120,127) n(Snare2),16}r}//40
+	$s{Sub{RandR(999,1728) RandV(120,127) n(Snare1),16}r}//38
+	$L{Sub{RandR(999,1728) RandV(123,127) n(LowTom2),16}r}//41
+	$l{Sub{RandR(999,1728) RandV(123,127) n(LowTom1),16}r}//43
+	$M{Sub{RandR(999,1728) RandV(123,127) n(MidTom2),16}r}//45
+	$m{Sub{RandR(999,1728) RandV(123,127) n(MidTom1),16}r}//47
+	$T{Sub{RandR(999,1728) RandV(123,127) n(HighTom2),16}r}//48
+	$t{Sub{RandR(999,1728) RandV(123,127) n(HighTom1),16}r}//50
+	$p{Sub{RandR(999,1728) RandV(110,127) n(PedalHiHat),16}r}//44
+	$h{Sub{RandR(999,1728) RandV(115,127) n(ClosedHiHat),16}r}//42
+	$o{Sub{RandR(999,1728) RandV(120,127) n(OpenHiHat),16}r}//46
+	$r{Sub{RandR(999,1728) RandV( 85,100) n(RideCymbal1),16}r}//51
+	$R{Sub{RandR(999,1728) RandV(120,127) n(RideBell),16}r}//53
 
-	$f{n(Slap),}//28
+	// Ride cup
+	$i{Sub{RandR(999,1728) RandV( 85,95)  n(MuteHighConga),16}r}//62
+	$I{Sub{RandR(999,1728) RandV(120,127) n(OpenHighConga),16}r}//63
+	$c{Sub{RandR(999,1728) RandV(120,127) n(CrashCymbal1),16}r}//49
+	$C{Sub{RandR(999,1728) RandV(120,127) n(CrashCymbal2),16}r}//57
+	$H{Sub{RandR(999,1728) RandV(120,127) n(SplashCymbal),16}r}//55
+	$A{Sub{RandR(999,1728) RandV(120,127) n(ChineseCymbal),16}r}//52
+
+	$f{Sub{RandR(999,1728) RandV(120,127) n(Slap),16}r}//28
 
 	// alt cymbal
-	$y{n(HighBongo),}//60
-	$Y{n(LowBongo),}//61
+	$y{Sub{RandR(999,1728) RandV(120,127) n(HighBongo),16}r}//60
+	$Y{Sub{RandR(999,1728) RandV(120,127) n(LowBongo),16}r}//61
+ 
+	q100
 
 	#rintro1={
 		Sub { Rythm { y4.Y4.y4.Y4.y4Y4 } }
@@ -895,11 +1046,11 @@ TR(10)
 		r2. r8 Rythm { m8m8M8M8L8 }
 	}
 
-	v127
+	Expression(127)
 	[3 #rmain1 ]
 	#rmain2
 
-	v110
+	Expression(110)
 	Sub { Rythm{A1} }
 	[7 #rmain3 ]
 	#rmain4
@@ -943,8 +1094,8 @@ Tempo 80
 	g2.gag
 	f#8.r32>d32 d2 dde
 	f4 fcf a-4 a-e-a-
-	Sub {r2Expression.onTime(127,80,!4) }
-	b-b-b- b-fb- b4
+	Sub {r2Expression.onTime(127,0,!8..) }
+	b-b-b- b-fb- b8..r32
 }
 
 #hchord1={
@@ -961,14 +1112,13 @@ Tempo 80
 	'c1e1'
 	'<a8.>d8.'r32 'f#32a32' 'f#2a2' l12'df#''df#''eg'
 	'c2a2''c2e-2'
-	Sub {r2Expression.onTime(127,30,!2) }
-	[6 'df'] 'd4g4'
+	Sub {r2Expression.onTime(127,0,!4.) }
+	[6 'df'] 'd8..g8..'r32
 }
 
 #hmelody2={
 	q100
-	Sub {Expression.onTime(95,127,!1) }
-	l28 gab>cdef
+	Sub{l28 gab>cdef l8}r4
 	l12
 	g2.gag
 	f#8.r32d32 d2 dde
@@ -981,7 +1131,7 @@ Tempo 80
 	g2.gag
 	f#8.r32>d32 d2 dde
 	f4 fcf a-4 a-e-a-
-	Sub {r2 Expression.onTime(127,40,!4) }
+	Sub {r2 Expression.onTime(127,0,!4) }
 	b-b-b- b-fb- b4
 }
 
@@ -1025,6 +1175,8 @@ TR(1)
 	#hmelody1
 	Voice(Piccolo)
 	v120
+	Expression(90)
+	Expression.onTime(95,127,!1)
 	#hmelody2
 
 TR(2)
@@ -1042,17 +1194,35 @@ TR(2)
 
 TR(3)
 	Time(132:0:0)
-	Expression(127)
 	o5
 	Voice(Strings2)
 	[7 r1]
 	r2.
 	o5
 	v127
+	Expression(90)
+	Expression.onTime(95,127,!1)
 	#hmelody2
 
+TR(8)
+	Time(132:0:0)
+	o5
+	Voice(Violin)
+	[7 r1]
+	r2.
+	o5
+	v100
+	Expression(90)
+	Expression.onTime(95,127,!1)
+	#hmelody2
+
+
+TR(9)
+	Time(132:0:0)
+	[15 r1]r2.
 	Voice(Strings1)
 	v98
+	Expression(127)
 	o4 Sub {#hmelody2 }
 	o5 Sub {#hmelody2 }
 	o6 #hmelody2
@@ -1102,32 +1272,33 @@ TR(10)
 	Time(132:0:0)
 	Voice(2)
 	Expression(127)
-	v127
-	$k{n(Sticks),} //37
-	$B{n(Kick2),}//35
-	$b{n(Kick1),}//36
-	$S{n(Snare2),}//40
-	$s{n(Snare1),}//38
-	$c{n(CrashCymbal1),}//49
-	$C{n(CrashCymbal2),}//57
+	$k{Sub{RandR(999,1728) RandV(124,127) n(Sticks),16}r} //37
+	$B{Sub{RandR(999,1728) RandV(124,127) n(Kick2),16}r}//35
+	$b{Sub{RandR(999,1728) RandV(124,127) n(Kick1),16}r}//36
+	$S{Sub{RandR(999,1728) RandV(124,127) n(Snare2),16}r}//40
+	$s{Sub{RandR(999,1728) RandV(124,127) n(Snare1),16}r}//38
+	$c{Sub{RandR(999,1728) RandV(124,127) n(CrashCymbal1),16}r}//49
+	$C{Sub{RandR(999,1728) RandV(124,127) n(CrashCymbal2),16}r}//57
 
 	[16 r1]
 	System.vAdd=1
 	#r1={
+		q100
 		v127
 		Sub { Rythm { c1 } }
-		Sub { r4 v20 Rythm { [48 v+ s64 ] } }
+//		Sub { r4 Expression.onTime(20,127,!2.) Rythm { S2. } }
 		Rythm {'b1s1'}
 
 		v127
 		Sub { Rythm { C1 } }
-		Sub { r4 v20 Rythm { [48 v+ s64 ] } }
+//		Sub { r4 Expression.onTime(20,127,!2.) Rythm { S2. } }
 		Rythm {'b1s1'}
 	}
 
 	#r2={
+		q100
 		v127
-		Sub { [2 v20 Rythm { [32 v+v+ s64 ] } ] }
+//		Sub { [2 r16 Expression.onTime(20,127,!4..) Rythm { S4.. } ] }
 		Rythm {'b2s2c2'}
 		v127
 		Tempo 57
@@ -1143,6 +1314,27 @@ TR(10)
 	[3 #r1]
 	#r2
 
+TR(11)
+	Time(132:0:0)
+	Voice(128)
+	Expression(127)
+	$S{v127 n(Snare2),}//40
+
+	[16 r1]
+	System.vAdd=1
+	#r1={
+		q100
+		r4 Expression.onTime(20,90,!2.) Rythm { S2. }
+
+		r4 Expression.onTime(20,90,!2.) Rythm { S2. }
+	}
+
+	#r2={
+		[2 r32 Expression.onTime(20,105,!4...) Rythm { S4... } ]
+	}
+	[3 #r1]
+	#r2
+
 //////////////////////////////////////////////////////////////////////////////
 
 #mbc1={
@@ -1150,7 +1342,7 @@ TR(10)
 }
 
 #mcc1={
-	[2 r[2'g>ce<'] ] r'g>ce<'
+	[2 r[2 BG(g>ce<)] ] r BG(g>ce<)
 }
 
 #mb1={
@@ -1160,7 +1352,7 @@ TR(10)
 
 #mc1={
 	#mcc1
-	[2 r[2'fb->d<'] ] r'fb->d<'
+	[2 r[2 BG(fb->d<)] ] r BG(fb->d<)
 }
 
 #mb2={
@@ -1169,8 +1361,8 @@ TR(10)
 }
 
 #mc2={
-	[2 r[2'gb->e-<'] ] r'gb->e-<'
-	[2 r[2'gb->e<'] ] r'gb->e<'
+	[2 r[2 BG(gb->e-<)] ] r BG(gb->e-<)
+	[2 r[2 BG(gb->e<)] ] r BG(gb->e<)
 }
 
 #mb3={
@@ -1203,36 +1395,36 @@ TR(10)
 }
 
 #mc3={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[2 r[2'g>cd<'] ] r'g>cd<'
-	[2 r[2'gb>d<'] ] r'gb>d<'
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[2 r[2 BG(g>cd<)] ] r BG(g>cd<)
+	[2 r[2 BG(gb>d<)] ] r BG(gb>d<)
 }
 
 #mc4={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[4 [3 'g>cd<' ] ] [2 [2 'g>cd<' ] ]
-	[4 [3 'gb>d<' ] ] [2 [2 'gb>d<' ] ]
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[4 [3 BG(g>cd<) ] ] [2 [2 BG(g>cd<) ] ]
+	[4 [3 BG(gb>d<) ] ] [2 [2 BG(gb>d<) ] ]
 }
 
 #mc5={
-	[2 r[2'a>cf<'] ] r'a>cf<'
-	[2 r[2'a>cf#<'] ] r'a>cf#<'
-	[2 r[2'gb>e<'] ] r'gb>e<'
-	[2 r[2'a>c#e<'] ] r'a>c#e<'
-	[2 r[2'fa>d<'] ] r'fa>d<'
-	[2 r[2'f#a>d<'] ] r'f#a>d<'
-	[4 [3 'g>cd<' ] ] [2 [2 'g>cd<' ] ]
-	[4 [3 'gb>d<' ] ] [2 [2 'gb>d<' ] ]
+	[2 r[2 BG(a>cf<)] ] r BG(a>cf<)
+	[2 r[2 BG(a>cf#<)] ] r BG(a>cf#<)
+	[2 r[2 BG(gb>e<)] ] r BG(gb>e<)
+	[2 r[2 BG(a>c#e<)] ] r BG(a>c#e<)
+	[2 r[2 BG(fa>d<)] ] r BG(fa>d<)
+	[2 r[2 BG(f#a>d<)] ] r BG(f#a>d<)
+	[4 [3 BG(g>cd<) ] ] [2 [2 BG(g>cd<) ] ]
+	[4 [3 BG(gb>d<) ] ] [2 [2 BG(gb>d<) ] ]
 }
 
 #mainbass1={
@@ -1280,28 +1472,28 @@ TR(10)
 #mainmelody1={
 	l8
 	Tempo 70
-	<g4>
+	q95<g4>
 	Tempo 180
-	g2^8<g>ce
+	q80g2^8<g>ce
 	f4e4d4c8<g8&
 	g1
 	^2^4.g>
 	g2^8<g>ce
 	f4e4d4c8g8&
 	g1
-	^2^4.g#
+	^2^8r8g#4
 	a2^8<a>cf
 	a4>c4<b4a8g8&
 	g2.>dc#&
 	c#2r<c#de
 	f2^8<fa>c
 	e2^8<a>ce
-	d2^4.g&
+	q95 d2^4.q80 g&
 	g2
 }
 
 #mainmelody2={
-	r4 l28 gab>cdef l8
+	r4Sub{l28 gab>cdef l8}r4
 
 	l8
 	g2^8<g>ce
@@ -1324,16 +1516,16 @@ TR(10)
 }
 
 #mainmelody3={
-	r4 l28 gab>cdef l8
+	r4Sub{l28 gab>cdef l8}r4
 	l8
 	g2^8<g>ce
 	f4e4d4c8<g8&
 	g1
-	^2r4.g>
+	^2^4rg>
 	g2^8<g>ce
 	f4e4d4c8g8&
 	g1
-	^2r4g#4
+	^2^8rg#4
 	a2^8<a>cf
 	a4>c4<b4a8g8&
 	g2.>dc#&
@@ -1369,42 +1561,22 @@ TR(10)
 	g1^1^1r1
 }
 
-#scale={
-	l16
-	Sub{
-		ccdefgab>c defgab>c
-		<b-b-agfe-dc<b- agfe-dc<b->
-		ccdefgab>c defgab>c
-		<b-b-agfe-dc<b- agfe-dc<b->
-		ccdefgab>c defgab>c
-		<b-b-agfe-dc<b- agfe-dc<b->
-		e-e-fga-b->cd e-fga-b->cde-
-		cc<b-agfedc <b-agfedc
-
-		ffgab->cdefgab->cdef
-		f#f#edc<bagf#edc<bagf#
-		eef#gab>c#d#ef#gab>c#d#e
-		c#c#<bagf#edc#<bagf#edc#<b>
-		ddefgab>c#defgab>c#d
-		cc<bagf#edc<bagf#edc
-	}
-	[14 r1]
-}
-
 TR(1)
 	Time(155:4:0)
 	Expression(127)
 	v127
 	Voice(Trumpet)
-	o6q91
+	o6q80
 	#mainmelody1
 	o5
 	Voice(Strings1)
-	v110
+	v115
+	q85
 	#mainmelody2
 	r4
 	Voice(Strings1)
-	v100
+	v105
+	q85
 	o4 Sub { #mainmelody3 }
 	o5 Sub { #mainmelody3 }
 	o6       #mainmelody3
@@ -1415,8 +1587,37 @@ TR(2)
 	o4
 	Voice(GrandPiano)
 	[34 r1]r4
-	o4 Sub { #scale }
-	o5 #scale
+	o5
+	Sub {
+		l16
+		[3
+			BF(c)BF(c)BF(d)BF(e)BF(f)BF(g)BF(a)BF(b)>
+			BF(c)BF(d)BF(e)BF(f)BF(g)BF(a)BF(b)>BF(c)
+			<
+			BF(b-)BF(b-)BF(a)BF(g)BF(f)BF(e-)BF(d)BF(c)<
+			BF(b-)BF(a)BF(g)BF(f)BF(e-)BF(d)BF(c)<BF(b-)
+			>
+		]
+		BF(e-)BF(e-)BF(f)BF(g)BF(a-)BF(b-)>BF(c)BF(d)
+		BF(e-)BF(f)BF(g)BF(a-)BF(b-)>BF(c)BF(d)BF(e-)
+		BF(c)BF(c)<BF(b-)BF(a)BF(g)BF(f)BF(e)BF(d)
+		BF(c)<BF(b-)BF(a)BF(g)BF(f)BF(e)BF(d)BF(c)
+
+		BF(f)BF(f)BF(g)BF(a)BF(b-)>BF(c)BF(d)BF(e)
+		BF(f)BF(g)BF(a)BF(b-)>BF(c)BF(d)BF(e)BF(f)
+		BF(f#)BF(f#)BF(e)BF(d)BF(c)<BF(b)BF(a)BF(g)
+		BF(f#)BF(e)BF(d)BF(c)<BF(b)BF(a)BF(g)BF(f#)
+		BF(e)BF(e)BF(f#)BF(g)BF(a)BF(b)>BF(c#)BF(d#)
+		BF(e)BF(f#)BF(g)BF(a)BF(b)>BF(c#)BF(d#)BF(e)
+		BF(c#)BF(c#)<BF(b)BF(a)BF(g)BF(f#)BF(e)BF(d)
+		BF(c#)<BF(b)BF(a)BF(g)BF(f#)BF(e)BF(d)BF(c#)
+		BF(d)BF(d)BF(e)BF(f)BF(g)BF(a)BF(b)>BF(c#)
+		BF(d)BF(e)BF(f)BF(g)BF(a)BF(b)>BF(c#)BF(d)
+		BF(c)BF(c)<BF(b)BF(a)BF(g)BF(f#)BF(e)BF(d)
+		BF(c)<BF(b)BF(a)BF(g)BF(f#)BF(e)BF(d)BF(c)
+	}
+	[14 r1]
+
 	o4l4
 	[4 'g.>c.d.<'][2 'g>cd<']
 	[4 'g.b.>d.<']
@@ -1440,8 +1641,8 @@ TR(3)
 TR(8)
 	Time(155:4:0)
 	Expression(127)
-	Voice(SynthStrings1)
-	v50
+	@(ElectricPiano2)//6
+	v70
 	o4q40
 	r4
 	#mainchord1
@@ -1473,33 +1674,33 @@ TR(9)
 TR(10)
 	Time(155:4:0)
 	Voice(1)
-	$k{n(Sticks),} //37
-	$B{n(Kick2),}//35
-	$b{n(Kick1),}//36
-	$S{n(Snare2),}//40
-	$s{n(Snare1),}//38
-	$L{n(LowTom2),}//41
-	$l{n(LowTom1),}//43
-	$M{n(MidTom2),}//45
-	$m{n(MidTom1),}//47
-	$T{n(HighTom2),}//48
-	$t{n(HighTom1),}//50
-	$p{n(PedalHiHat),}//44
-	$h{n(ClosedHiHat),}//42
-	$o{n(OpenHiHat),}//46
-	$r{n(RideCymbal1),}//51
-	$R{n(RideBell),}//53
+	$k{Sub{RandR(999,1728) RandV(124,127) n(Sticks),16}r} //37
+	$B{Sub{RandR(999,1728) RandV(124,127) n(Kick2),16}r}//35
+	$b{Sub{RandR(999,1728) RandV(124,127) n(Kick1),16}r}//36
+	$S{Sub{RandR(999,1728) RandV(120,127) n(Snare2),16}r}//40
+	$s{Sub{RandR(999,1728) RandV(120,127) n(Snare1),16}r}//38
+	$L{Sub{RandR(999,1728) RandV(123,127) n(LowTom2),16}r}//41
+	$l{Sub{RandR(999,1728) RandV(123,127) n(LowTom1),16}r}//43
+	$M{Sub{RandR(999,1728) RandV(123,127) n(MidTom2),16}r}//45
+	$m{Sub{RandR(999,1728) RandV(123,127) n(MidTom1),16}r}//47
+	$T{Sub{RandR(999,1728) RandV(123,127) n(HighTom2),16}r}//48
+	$t{Sub{RandR(999,1728) RandV(123,127) n(HighTom1),16}r}//50
+	$p{Sub{RandR(999,1728) RandV(110,127) n(PedalHiHat),16}r}//44
+	$h{Sub{RandR(999,1728) RandV(115,127) n(ClosedHiHat),16}r}//42
+	$o{Sub{RandR(999,1728) RandV(120,127) n(OpenHiHat),16}r}//46
+	$r{Sub{RandR(999,1728) RandV( 85,100) n(RideCymbal1),16}r}//51
+	$R{Sub{RandR(999,1728) RandV(120,127) n(RideBell),16}r}//53
 	// Ride cup
-	$i{n(MuteHighConga),}//62
-	$I{n(OpenHighConga),}//63
-	$c{n(CrashCymbal1),}//49
-	$C{n(CrashCymbal2),}//57
-	$H{n(SplashCymbal),}//55
-	$A{n(ChineseCymbal),}//52
+	$i{Sub{RandR(999,1728) RandV( 85,95)  n(MuteHighConga),16}r}//62
+	$I{Sub{RandR(999,1728) RandV(120,127) n(OpenHighConga),16}r}//63
+	$c{Sub{RandR(999,1728) RandV(120,127) n(CrashCymbal1),16}r}//49
+	$C{Sub{RandR(999,1728) RandV(120,127) n(CrashCymbal2),16}r}//57
+	$H{Sub{RandR(999,1728) RandV(120,127) n(SplashCymbal),16}r}//55
+	$A{Sub{RandR(999,1728) RandV(120,127) n(ChineseCymbal),16}r}//52
 
 	// alt cymbal
-	$y{n(HighBongo),}//60
-	$Y{n(LowBongo),}//61
+	$y{Sub{RandR(999,1728) RandV(120,127) n(HighBongo),16}r}//60
+	$Y{Sub{RandR(999,1728) RandV(120,127) n(LowBongo),16}r}//61
 
 	#rmain1={
 		Sub { Rythm { R4r8R4r8R8r8 } }
@@ -1583,7 +1784,7 @@ TR(10)
 	}
 
 	r4
-	v110
+	Expression(110)
 	Sub { Rythm{A1} }
 	[7 #rmain3 ]
 	#rmain4
@@ -1618,172 +1819,3 @@ TR(10)
 		'b4s4C4'
 	}
 
-
-IF(0) {
-End
-
-##############################################################################
-# TiMidiTy Config (v2.0)
-
-dir ../patches/sf2_all
-dir ../patches/sf2_all/atomic
-dir ../patches/sf2_all/fluid3
-dir ../patches/sf2_all/realgs
-dir ../patches/sf2_all/ultimate
-dir ../patches/sf2_all/scc
-dir ../patches/sf2_all/GMRBasico
-dir ../patches/sf2_all/ForClassicalMusic
-dir ../patches/sf2_part/drumkit
-dir ../patches/sf2_part/piano
-dir ../patches/sf2_part/famicom
-dir ../patches/sf2_all/musix
-dir ../patches/sf2_all/Giant
-
-##############################################################################
-
-bank 0
-	# vib
-	11 %font "GMR Basico1.1.sf2" 0 11 amp=50 rate=245:40:40:40:40:40 tremolo=0:72:240
-
-	# brasssele
-	61 %font JClive21.sf2 0 61  amp=63
-
-	# string1
-#	48 %font atomic.sf2 0 48 amp=110 rate=255:105:105:105:105:105
-	48 %font "Titanic_200_GMGS_1.2.sf2" 0 48 amp=260 keep=env rate=255:105:105:105:105:105
-
-	# Synth Strings1 -> electric piano
-	50 %font Piano_Yamaha_DX7.sf2 0 0 amp=165 keep=loop rate=238:120:120:120:120:120
-
-	# string2
-	49 %font "5.7bank2.sf2" 0 49 amp=30 pan=+10 rate=255
-
-	# trumpet
-	56 %font atomic.sf2 0 56 amp=70 rate=252:150:150:150:150:150
-
-	# dr organ
-#	16 %font atomic.sf2 0 16 amp=70
-	16 %font Titanic_200_GMGS_1.2.sf2 0 16 amp=82 tremolo=0:65:210
-
-	# piccolo
-#	72 %font Titanic_200_GMGS_1.2.sf2 0 70 amp=75 keep=loop
-#	72 %font FluidR3GM.SF2 0 70 amp=100 keep=loop
-	72 %font JClive21.sf2 0 72 amp=50 keep=loop
-
-	# flute
-	73 %font "GMR Basico1.1.sf2" 0 73 amp=25 keep=loop
-
-	# horn
-	60 %font Titanic_200_GMGS_1.2.sf2 0 60 amp=75
-	60 %font Evanessence2.sf2 0 60 amp=75 keep=loop
-
-	# bass
-	39 %font Titanic_200_GMGS_1.2.sf2 0 33 amp=165 keep=loop
-
-	# oboe
-	68 %font Titanic_200_GMGS_1.2.sf2 0 68 amp=65 keep=loop tune=+12
-
-	# trombone
-	57 %font Evanessence2.sf2 0 57 amp=250
-
-	# contora
-	43 %font "GMR Basico1.1.sf2" 0 48 amp=85 pan=+10
-
-	# harp
-	46 %font "GMR Basico1.1.sf2" 0 46 amp=75 pan=+10 rate=245:3:3:20:20:20
-
-	# timpani
-	47 %font "GMR Basico1.1.sf2" 0 47 amp=150 pan=-40 tune=-12 # rate=245:3:3:20:20:20
-
-	# piano
-#	0 %font ClavinovaPiano1V2.0.sf2 0 0  amp=170
-	0 %font acoustic_grand_piano_ydp_20080910.sf2 0 0 amp=290
-
-	# new age
-	88 %font "GMR Basico1.1.sf2" 0 88 amp=100 keep=loop tune=-12
-
-	# synth
-	80 %font Famicom.sf2 0 5 amp=55 keep=loop
-
-	# Ah
-#	52 %font Titanic_200_GMGS_1.2.sf2 0 52 amp=450 keep=loop
-	52 %font FluidR3GM.SF2 0 52 amp=105 keep=loop
-
-##############################################################################
-
-# Standard drums
-
-drumset 0
-	# brash
-#	31 %font Titanic_200_GMGS_1.2.sf2 128 0 31 amp=280 tune=-1
-#	31 %font drumkit1.3XG.sf2 128 0 31 amp=255
-	28 %font Evanessence2.sf2 128 40 38 amp=250
-
-	# bd
-	35 %font FluidR3GM.SF2 128 49 35 amp=300
-	36 %font FluidR3GM.SF2 128 27 35 amp=150
-	35 %font FluidR3GM.SF2 128 49 35 amp=300
-	36 %font Titanic_200_GMGS_1.2.sf2 128 17 35 amp=200
-
-	# stick
-	31 %font Titanic_200_GMGS_1.2.sf2 128 0 31 amp=280 tune=-1
-#	31 %font drumkit1.3XG.sf2 128 0 31 amp=255
-
-	# sd
-#	38 %font Titanic_200_GMGS_1.2.sf2 128 0 40 amp=160
-#	40 %font Titanic_200_GMGS_1.2.sf2 128 0 40 amp=140
-	38 %font drumkit1.3XG.sf2 128 9 38 amp=170 tune=+5
-	40 %font drumkit1.3XG.sf2 128 9 40 amp=170 tune=+5
-
-	# cymbal
-	49 %font Titanic_200_GMGS_1.2.sf2 128 0 49 amp=200 pan=-80 tune=+0
-	57 %font Titanic_200_GMGS_1.2.sf2 128 0 49 amp=200 pan=+80 tune=+0
-	55 %font Titanic_200_GMGS_1.2.sf2 128 0 49 amp=200 pan=0 tune=+0
-
-	# chinise
-	52 %font Titanic_200_GMGS_1.2.sf2 128 0 52 amp=200 pan=30 tune=-2
-#	52 %font FluidR3GM.SF2 128 0 52 amp=230 pan=30 tune=+0
-
-	# alt classic cymbal
-	60 %font Titanic_200_GMGS_1.2.sf2 128 48 55 amp=150 pan=-25 tune=+0
-	61 %font Titanic_200_GMGS_1.2.sf2 128 48 55 amp=150 pan=+70 tune=+0
-
-	# ride
-	51 %font Titanic_200_GMGS_1.2.sf2 128 0 51 amp=150 pan=+70 tune=+0
-	53 %font Titanic_200_GMGS_1.2.sf2 128 0 51 amp=320 pan=+70 tune=+0
-
-	# ride cup
-	62 %font "GMR Basico1.1.sf2" 128 0 53 amp=160 pan=+70 tune=+0
-	63 %font "GMR Basico1.1.sf2" 128 0 53 amp=360 pan=+70 tune=+0
-#	53 %font drumkit1.3XG.sf2 128 0 53 amp=460 pan=+70 tune=+0
-
-#extension altassign 42 44 46
-	42 %font "Titanic_200_GMGS_1.2.sf2" 128 17 42 amp=200 pan=-70 tune=+0 rate=:50:50:50:120:120
-	44 %font "GMR Basico1.1.sf2" 128 17 44 amp=55 pan=-70 tune=+0
-	46 %font "GMR Basico1.1.sf2" 128 17 46 amp=60 pan=-70 tune=+0
-
-	# tom
-	41 %font Titanic_200_GMGS_1.2.sf2 128 17 41 amp=180 tune=+0
-	43 %font Titanic_200_GMGS_1.2.sf2 128 17 43 amp=180 tune=+2
-	45 %font Titanic_200_GMGS_1.2.sf2 128 17 45 amp=180 tune=+4
-	47 %font Titanic_200_GMGS_1.2.sf2 128 17 47 amp=180 tune=+6
-	48 %font Titanic_200_GMGS_1.2.sf2 128 17 48 amp=180 tune=+8
-	50 %font Titanic_200_GMGS_1.2.sf2 128 17 50 amp=180 tune=+10
-
-##############################################################################
-
-# orchset drums
-
-drumset 1
-	# bd
-	36 %font Titanic_200_GMGS_1.2.sf2 128 48 35 amp=360
-
-	# sd
-	38 %font Titanic_200_GMGS_1.2.sf2 128 48 40 amp=370 tune=-5
-#	40 %font drumkit1.3XG.sf2 128 9 40 amp=170 tune=+5
-
-	# cymbal
-	49 %font Titanic_200_GMGS_1.2.sf2 128 48 55 amp=220 pan=-25 tune=+0
-	57 %font Titanic_200_GMGS_1.2.sf2 128 48 55 amp=260 pan=+70 tune=+0
-
-}
